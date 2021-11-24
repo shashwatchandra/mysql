@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "adminUsername": {
+          "value": "avmin"
+      },
+      "authenticationType": {
+          "value": "Key"
+      },
+      "adminPasswordOrKey": {
+          "value": ""
+      },
+        "discover-username" :{
+          "value": "orchestrator"
+        },
+        "discover-password" :{
+          "value": "fifa2022"
+        },
+        "orch-password": {
+          "value": "orchpass"
+        },
+        "replication-password": {
+          "value": "fifa2022"
+        },
+        "_artifactsLocation": {
+            "value": "https://bootdiagmysql.blob.core.windows.net/mysqlscripts/"
+        },
+        "_artifactsLocationSasToken": {
+            "value": "?sp=r&st=2021-11-24T17:47:26Z&se=2022-01-01T01:47:26Z&spr=https&sv=2020-08-04&sr=b&sig=O6%2FXbpghamo2Nem7%2Bg%2B5Firfxo%2FYjCvytnv0SIHQ34w%3D"
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "namespace": {
+          "value": "fifa"
+        },
+        "vmbasename": {
+          "value": "replica01"
+        },
+        "vmSize": {
+          "value": "Standard_D4_v3"
+        },
+       "virtualNetworkName": {
+          "value": "mysqlvnet"
+        },
+        "subnetName": {
+          "value": "dse"
+        },
+        "zone": {
+          "value": "2"
+        },
+        "MySQLRole": {
+          "value": "replica"
+        },
+        "UniqueInstanceId": {
+          "value": "2"
+        },
+        "OpenArkPrivateIp": {
+          "value": "10.0.0.4"
+        },
+        "SourcePrivateIp": {
+          "value": "10.0.0.5"
+        }    
+      }
+}

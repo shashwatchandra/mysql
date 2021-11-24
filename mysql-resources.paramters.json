@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "value": "https://bootdiagmysql.blob.core.windows.net/mysqlscripts/"
+        },
+        "_artifactsLocationSasToken": {
+            "value": "?sp=r&st=2021-11-24T19:56:08Z&se=2022-01-01T03:56:08Z&spr=https&sv=2020-08-04&sr=c&sig=fqXwAHJbe%2FofdPuuWjTTzbz40x%2BHKSqf01S9e9uVXGU%3D"
+        }
+      }
+}

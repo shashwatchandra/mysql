@@ -1,0 +1,123 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+     "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "[deployment().properties.templatelink.uri]",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    }
+    },
+    "variables": {
+        //"sharedTemplateUrl": "[uri(parameters('_artifactsLocation'), concat('nested/shared-resources.json', parameters('_artifactsLocationSasToken')))]",
+        "OpenArkTemplateUrl": "[concat(parameters('_artifactsLocation'), 'openark-resources.json', '?sp=r&st=2021-11-24T20:00:51Z&se=2022-01-01T04:00:51Z&spr=https&sv=2020-08-04&sr=b&sig=OxE9m0T%2BpAYtp9UNY%2BGvJunv9%2BE1h0XZQoNpt976OIY%3D')]",
+        "OpenArkParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'open-ark-resources.parameters.json', '?sp=r&st=2021-11-24T20:02:33Z&se=2022-01-01T04:02:33Z&spr=https&sv=2020-08-04&sr=b&sig=M3HYd0Rw7GZDTxoxkL%2B%2FhNF7y8ZswBNHW7RBOhSowD4%3D')]",
+        "SourceTemplateUrl": "[concat(parameters('_artifactsLocation'), 'primary-resources.json', '?sp=r&st=2021-11-24T20:02:59Z&se=2022-01-01T04:02:59Z&spr=https&sv=2020-08-04&sr=b&sig=iODwkRY2X1BhPdzeFwrtaVssW%2F4yaodK8XsPV%2BR7gXI%3D')]",
+        "SourceParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'primary-resources.parameters.json', '?sp=r&st=2021-11-24T20:03:27Z&se=2022-01-01T04:03:27Z&spr=https&sv=2020-08-04&sr=b&sig=0t9cKXccbf9o1GSkhR7nMJYtrcGg58QZrp74of2Resw%3D')]",
+        "ReplicaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'replica-resources.json', '?sp=r&st=2021-11-24T20:03:51Z&se=2021-11-25T04:03:51Z&spr=https&sv=2020-08-04&sr=b&sig=rjtUQ6YsHvqEEbkmgs%2BU2i7kPpIYE%2BX6IJwz%2B3yHC20%3D')]",
+        "ReplicaParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'replica01-resources.parameters.json', '?sp=r&st=2021-11-24T20:04:08Z&se=2022-01-01T04:04:08Z&spr=https&sv=2020-08-04&sr=b&sig=9jdlYfnQ1Y8Yo7BahdQsQXNMPjLTGpa%2BMrjmH7O4oWg%3D')]"
+    },
+    "resources": [
+        // {
+        // "apiVersion": "2020-11-01",
+        // "type": "Microsoft.Network/virtualNetworks",
+        // "name": "[parameters('networkSettings').virtualNetworkName]",
+        // "location": "[parameters('location')]",
+        // "properties": {
+        //     "addressSpace": {
+        //     "addressPrefixes": [
+        //         "[parameters('networkSettings').addressPrefix]"
+        //     ]
+        //     },
+        //     "subnets": [
+        //     {
+        //         "name": "[parameters('networkSettings').subnet.dse.name]",
+        //         "properties": {
+        //         "addressPrefix": "[parameters('networkSettings').subnet.dse.prefix]"
+        //         }
+        //     }
+        //     ]
+        //   }
+        // },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "OpenArkNode",
+            "dependsOn": [
+                //"[resourceId('Microsoft.Resources/deployments/', 'shared')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('OpenArkTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                 "parametersLink": {
+                    "uri": "[variables('OpenArkParaTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "SourceNode",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments/', 'OpenArkNode')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('SourceTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                 "parametersLink": {
+                    "uri": "[variables('SourceParaTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                }
+                // "parameters": {
+                //    "OpenArkPrivateIp": {
+                //        "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
+                //    }
+                // }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "ReplicaNode",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments/', 'OpenArkNode')]",
+                "[resourceId('Microsoft.Resources/deployments/', 'SourceNode')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ReplicaTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                 "parametersLink": {
+                    "uri": "[variables('ReplicaParaTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                }//,
+                // "parameters": {
+                //     "OpenArkPrivateIp": {
+                //        "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
+                //    },
+                //    "SourcePrivateIp": {
+                //        "value": "[reference('SourceNode').outputs.replicaPublicIP.value]"
+                //    }
+                // }
+            }
+        }
+    ]
+}

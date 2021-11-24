@@ -1,0 +1,208 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "adminUsername": {
+        "type": "string"
+      },
+      "authenticationType": {
+        "type": "string"
+      },
+      "adminPasswordOrKey": {
+        "type": "string"
+      },
+      "discover-username" :{
+        "type": "string"
+      },
+      "discover-password" :{
+        "type": "string"
+      },
+      "orch-password": {
+        "type": "string"
+      },
+      "namespace": {
+        "type": "string"
+      },
+      "vmbasename": {
+        "type": "string"
+      },
+      "vmSize": {
+        "type": "string"
+      },
+     "virtualNetworkName": {
+        "type": "string"
+      },
+      "subnetName": {
+        "type": "string"
+      },
+      "zone": {
+        "type": "string",
+        "defaultValue": "1",
+        "allowedValues": [
+            "1",
+            "2",
+            "3"
+        ],
+        "metadata": {
+            "description": "Zone number for the virtual machine"
+        }
+      },
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+      },
+      "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "[deployment().properties.templatelink.uri]",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    }
+    },
+    "variables": {
+     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+      "linuxConfiguration": {
+        "disablePasswordAuthentication": true,
+        "ssh": {
+          "publicKeys": [
+            {
+              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+              "keyData": "[parameters('adminPasswordOrKey')]"
+            }
+          ]
+        }
+      },
+    "OsSettings": {
+      "imageReference": {
+         "publisher": "Canonical",
+                "offer": "UbuntuServer",
+                "sku": "14.04.4-LTS",
+                "version": "latest"
+       }
+      }
+    },
+    "resources": [
+      {
+        "apiVersion": "2020-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'pip')]",
+        "location": "[parameters('location')]",
+        "sku": {
+            "name": "Standard"
+        },
+        "zones": [
+          "[parameters('zone')]"
+        ],
+        "properties": {
+            "publicIPAllocationMethod": "Static",
+            "publicIPAddressVersion": "IPv4"
+        }
+      },
+      {
+        "apiVersion": "2020-11-01",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'nic')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('namespace'), parameters('vmbasename'), 'pip'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                 "publicIPAddress": {
+                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('namespace'), parameters('vmbasename'), 'pip'))]"
+                 },
+                "subnet": {
+                  "id": "[variables('subnetRef')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2020-12-01",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[concat(parameters('namespace'), concat(parameters('vmbasename'), 'vm'))]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
+        ],
+        "zones": [
+        "[parameters('zone')]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[concat(parameters('namespace'), concat(parameters('vmbasename'), 'vm'))]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPasswordOrKey')]",
+            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+          },
+          "storageProfile": {
+            "imageReference": "[variables('OsSettings').imageReference]",
+            "osDisk": {
+              "name": "[concat(parameters('namespace'), concat(parameters('vmbasename'), 'vm'),'_OSDisk')]",
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
+              }
+            ]
+          }
+        }
+      }
+    //   {
+    //     "type": "Microsoft.Compute/virtualMachines/extensions",
+    //     "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'vm', '/Install')]",
+    //     "apiVersion": "2020-12-01",
+    //     "location": "[parameters('location')]",
+    //     "dependsOn": [
+    //       "[resourceId('Microsoft.Compute/virtualMachines/', concat(parameters('namespace'), parameters('vmbasename'), 'vm'))]",
+    //       "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
+    //     ],
+    //     "properties": {
+    //       "publisher": "Microsoft.Azure.Extensions",
+    //       "type": "CustomScript",
+    //       "typeHandlerVersion": "2.0",
+    //       "autoUpgradeMinorVersion": true,
+    //       "settings": {
+    //       },
+    //       "protectedSettings": {
+    //           "fileUris": [
+    //               "[concat(parameters('_artifactsLocation'), 'openark-provisioner.sh', parameters('_artifactsLocationSasToken'))]"
+    //             ],
+    //         "commandToExecute": "[concat('sudo bash ./openark-provisioner.sh --discover-username ', parameters('discover-username'), ' --discover-password ',  parameters('discover-password'), ' --orch-password ', parameters('orch-password'))]"
+    //       }
+    //     }
+    //   }
+    ],
+    "outputs":{
+        "openarkNic":{
+            "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))).ipConfigurations[0].properties.privateIPAddress]",
+            "type": "string"
+        },
+        "openarkPublicIP":{
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('namespace'), parameters('vmbasename'), 'pip'))).ipAddress]",
+            "type": "string"
+        }
+    }
+  }
