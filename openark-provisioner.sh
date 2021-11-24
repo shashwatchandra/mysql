@@ -1,5 +1,5 @@
 !/usr/bin/env bash
-# sudo ./provisioner.sh --role replica -i 2 --orch-ipaddress 172.16.1.9 --source-ipaddress 172.16.1.8
+
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
