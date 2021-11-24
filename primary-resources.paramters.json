@@ -2,20 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "adminUsername": {
-          "value": "avmin"
-      },
-      "authenticationType": {
-          "value": "Key"
-      },
-      "adminPasswordOrKey": {
-          "value": ""
-      },
-        "discover-username" :{
-          "value": "orchestrator"
+        "adminUsername": {
+            "value": "avmin"
         },
-        "discover-password" :{
-          "value": "fifa2022"
+        "authenticationType": {
+            "value": "Key"
+        },
+        "adminPasswordOrKey": {
+            "value": ""
         },
         "orch-password": {
           "value": "orchpass"
