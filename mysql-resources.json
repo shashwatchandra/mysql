@@ -2,7 +2,61 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-     "_artifactsLocation": {
+      "adminUsername": {
+        "type": "string"
+      },
+      "authenticationType": {
+        "type": "string"
+      },
+      "adminPasswordOrKey": {
+        "type": "string"
+      },
+      "discover-username" :{
+        "type": "string"
+      },
+      "discover-password" :{
+        "type": "string"
+      },
+      "orch-password": {
+        "type": "string"
+      },
+     "replication-password": {
+        "type": "string"
+      },
+      "namespace": {
+        "type": "string"
+      },
+      "vmbasename": {
+        "type": "string"
+      },
+      "vmSize": {
+        "type": "string"
+      },
+     "virtualNetworkName": {
+        "type": "string"
+      },
+      "subnetName": {
+        "type": "string"
+      },
+      "zone": {
+        "type": "string",
+        "defaultValue": "1",
+        "allowedValues": [
+            "1",
+            "2",
+            "3"
+        ],
+        "metadata": {
+            "description": "Zone number for the virtual machine"
+        }
+      },
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+      },
+      "_artifactsLocation": {
       "type": "string",
       "defaultValue": "[deployment().properties.templatelink.uri]",
       "metadata": {
@@ -15,16 +69,45 @@
       "metadata": {
         "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
-    }
+    },
+    "MySQLRole": {
+        "type": "string",
+        "defaultValue": "source",
+        "allowedValues": [
+            "source",
+            "replica"
+        ],
+        "metadata": {
+          "description": "Role of the MySQL Instance"
+        }
+      },
+    "UniqueInstanceId": {
+        "type": "string",
+        "metadata": {
+          "description": "ID of the MySQL instance"
+        }
+      },
+    "OpenArkPrivateIp": {
+        "type": "string",
+        "metadata": {
+          "description": "Private IP of the OpenArk VM"
+        }
+      },
+      "SourcePrivateIp": {
+        "type": "string",
+        "metadata": {
+          "description": "Private IP of the Primary/Source VM"
+        }
+      }
     },
     "variables": {
         //"sharedTemplateUrl": "[uri(parameters('_artifactsLocation'), concat('nested/shared-resources.json', parameters('_artifactsLocationSasToken')))]",
-        "OpenArkTemplateUrl": "[concat(parameters('_artifactsLocation'), 'openark-resources.json', '?sp=r&st=2021-11-24T20:00:51Z&se=2022-01-01T04:00:51Z&spr=https&sv=2020-08-04&sr=b&sig=OxE9m0T%2BpAYtp9UNY%2BGvJunv9%2BE1h0XZQoNpt976OIY%3D')]",
-        "OpenArkParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'open-ark-resources.parameters.json', '?sp=r&st=2021-11-24T20:02:33Z&se=2022-01-01T04:02:33Z&spr=https&sv=2020-08-04&sr=b&sig=M3HYd0Rw7GZDTxoxkL%2B%2FhNF7y8ZswBNHW7RBOhSowD4%3D')]",
-        "SourceTemplateUrl": "[concat(parameters('_artifactsLocation'), 'primary-resources.json', '?sp=r&st=2021-11-24T20:02:59Z&se=2022-01-01T04:02:59Z&spr=https&sv=2020-08-04&sr=b&sig=iODwkRY2X1BhPdzeFwrtaVssW%2F4yaodK8XsPV%2BR7gXI%3D')]",
-        "SourceParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'primary-resources.parameters.json', '?sp=r&st=2021-11-24T20:03:27Z&se=2022-01-01T04:03:27Z&spr=https&sv=2020-08-04&sr=b&sig=0t9cKXccbf9o1GSkhR7nMJYtrcGg58QZrp74of2Resw%3D')]",
-        "ReplicaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'replica-resources.json', '?sp=r&st=2021-11-24T20:03:51Z&se=2021-11-25T04:03:51Z&spr=https&sv=2020-08-04&sr=b&sig=rjtUQ6YsHvqEEbkmgs%2BU2i7kPpIYE%2BX6IJwz%2B3yHC20%3D')]",
-        "ReplicaParaTemplateUrl": "[concat(parameters('_artifactsLocation'), 'replica01-resources.parameters.json', '?sp=r&st=2021-11-24T20:04:08Z&se=2022-01-01T04:04:08Z&spr=https&sv=2020-08-04&sr=b&sig=9jdlYfnQ1Y8Yo7BahdQsQXNMPjLTGpa%2BMrjmH7O4oWg%3D')]"
+        "OpenArkTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'openark-resources.json')]",
+        "OpenArkParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'open-ark-resources.paramters.json')]",
+        "SourceTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'primary-resources.json')]",
+        "SourceParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'primary-resources.paramters.json')]",
+        "ReplicaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'replica-resources.json')]",
+        "ReplicaParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'replica01-resources.paramters.json')]"
     },
     "resources": [
         // {
@@ -61,10 +144,54 @@
                     "uri": "[variables('OpenArkTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
-                 "parametersLink": {
-                    "uri": "[variables('OpenArkParaTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
+                "parameters": {
+                        "adminUsername":{
+                            "value": "[parameters('adminUsername')]"  
+                        },
+                         "authenticationType": {
+                            "value": "[parameters('authenticationType')]"
+                        },
+                         "adminPasswordOrKey": {
+                          "value": "[parameters('adminPasswordOrKey')]"
+                        },
+                         "discover-username" :{
+                            "value": "[parameters('discover-username')]"
+                        },
+                        "discover-password" :{
+                            "value": "[parameters('discover-password')]"
+                        },
+                        "orch-password": {
+                        "value": "[parameters('orch-password')]"
+                        },
+                        "_artifactsLocation": {
+                            "value": "[parameters('_artifactsLocation')]"
+                        },
+                        "_artifactsLocationSasToken": {
+                            "value": "[parameters('_artifactsLocationSasToken')]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "namespace": {
+                            "value": "[parameters('namespace')]"
+                        },
+                        "vmbasename": {
+                            "value": "[parameters('vmbasename')]"
+                        },
+                        "vmSize": {
+                            "value": "[parameters('vmSize')]"
+                        },
+                        "virtualNetworkName": {
+                            "value": "[parameters('virtualNetworkName')]"
+                        },
+                        "subnetName": {
+                            "value": "[parameters('subnetName')]"
+                        },
+                        "zone": {
+                            "value": "[parameters('zone')]"
+                        }
                 }
+              
             }
         },
         {
@@ -80,15 +207,59 @@
                     "uri": "[variables('SourceTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
-                 "parametersLink": {
-                    "uri": "[variables('SourceParaTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
+                "parameters": {
+                        "adminUsername":{
+                            "value": "[parameters('adminUsername')]"  
+                        },
+                         "authenticationType": {
+                            "value": "[parameters('authenticationType')]"
+                        },
+                         "adminPasswordOrKey": {
+                        "value": "[parameters('adminPasswordOrKey')]"
+                        },
+                         "replication-password": {
+                            "value": "[parameters('replication-password')]"
+                        },
+                        "orch-password": {
+                        "value": "[parameters('orch-password')]"
+                        },
+                        "_artifactsLocation": {
+                            "value": "[parameters('_artifactsLocation')]"
+                        },
+                        "_artifactsLocationSasToken": {
+                            "value": "[parameters('_artifactsLocationSasToken')]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "namespace": {
+                            "value": "[parameters('namespace')]"
+                        },
+                        "vmbasename": {
+                            "value": "[parameters('vmbasename')]"
+                        },
+                        "vmSize": {
+                            "value": "[parameters('vmSize')]"
+                        },
+                        "virtualNetworkName": {
+                            "value": "[parameters('virtualNetworkName')]"
+                        },
+                        "subnetName": {
+                            "value": "[parameters('subnetName')]"
+                        },
+                        "zone": {
+                            "value": "[parameters('zone')]"
+                        },
+                        "MySQLRole": {
+                            "value": "[parameters('MySQLRole')]"
+                        },
+                        "UniqueInstanceId": {
+                            "value": "[parameters('UniqueInstanceId')]"
+                        },
+                        "OpenArkPrivateIp": {
+                           "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
+                        }
                 }
-                // "parameters": {
-                //    "OpenArkPrivateIp": {
-                //        "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
-                //    }
-                // }
             }
         },
         {
@@ -105,18 +276,62 @@
                     "uri": "[variables('ReplicaTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
-                 "parametersLink": {
-                    "uri": "[variables('ReplicaParaTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
-                }//,
-                // "parameters": {
-                //     "OpenArkPrivateIp": {
-                //        "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
-                //    },
-                //    "SourcePrivateIp": {
-                //        "value": "[reference('SourceNode').outputs.replicaPublicIP.value]"
-                //    }
-                // }
+                "parameters": {
+                        "OpenArkPrivateIp": {
+                            "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
+                        },
+                        "SourcePrivateIp": {
+                            "value": "[reference('SourceNode').outputs.replicaPublicIP.value]"
+                        },
+                        "zone": {
+                            "value": "2"
+                        },
+                        "MySQLRole": {
+                            "value": "replica"
+                        },
+                        "UniqueInstanceId": {
+                            "value": "2"
+                        },
+                        "adminUsername":{
+                            "value": "[parameters('adminUsername')]"  
+                        },
+                         "authenticationType": {
+                            "value": "[parameters('authenticationType')]"
+                        },
+                         "adminPasswordOrKey": {
+                        "value": "[parameters('adminPasswordOrKey')]"
+                        },
+                         "replication-password": {
+                            "value": "[parameters('replication-password')]"
+                        },
+                        "orch-password": {
+                        "value": "[parameters('orch-password')]"
+                        },
+                        "_artifactsLocation": {
+                            "value": "[parameters('_artifactsLocation')]"
+                        },
+                        "_artifactsLocationSasToken": {
+                            "value": "[parameters('_artifactsLocationSasToken')]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "namespace": {
+                            "value": "[parameters('namespace')]"
+                        },
+                        "vmbasename": {
+                            "value": "[parameters('vmbasename')]"
+                        },
+                        "vmSize": {
+                            "value": "[parameters('vmSize')]"
+                        },
+                        "virtualNetworkName": {
+                            "value": "[parameters('virtualNetworkName')]"
+                        },
+                        "subnetName": {
+                            "value": "[parameters('subnetName')]"
+                        }
+                }
             }
         }
     ]
