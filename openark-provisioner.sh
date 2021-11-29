@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# sudo ./provisioner.sh --role replica -i 2 --orch-ipaddress 172.16.1.9 --source-ipaddress 172.16.1.8
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
@@ -10,8 +15,8 @@ Available options:
 
 -h, --help                 Print this help and exit
 -v, --verbose              Print script debug info
-    --discover-username    Username for OpenArk orchestrator autodiscover. 
-    --discover-password    Password for OpenArk orchestrator autodiscover.
+    --discover-username    Username for OpenArk orchestrator autodiscover. Default: orchpass
+    --discover-password    Password for OpenArk orchestrator autodiscover. Default: orchpass
     --orch-password	   UI Password for admin user
 EOF
   exit
@@ -42,6 +47,11 @@ die() {
 }
 
 parse_params() {
+  # default values of variables set from params
+  orch_password=orchpass
+  discover_username="orchestrator"
+  discover_password="fifa2022"
+
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
@@ -247,6 +257,7 @@ END_HEREDOC
 }
 
 msg "Deploying"
+sleep 60
 deploy_orchestrator
 deploy_orchestrator_topology_config
 deploy_orchestrator_config

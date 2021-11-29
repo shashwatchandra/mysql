@@ -266,6 +266,7 @@ deploy_relay(){
 }
 
 msg "Deploying role: ${role}"
+sleep 60
 case "${role}" in 
     "source") 
         deploy_source
