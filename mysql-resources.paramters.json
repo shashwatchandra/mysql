@@ -36,7 +36,7 @@
         "value": "fifa"
       },
       "vmSize": {
-        "value": "Standard_D4_v3"
+        "value": "Standard_D2s_v3"
       },
      "virtualNetworkName": {
         "value": "mysqlvnet"
