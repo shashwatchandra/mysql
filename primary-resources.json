@@ -189,31 +189,31 @@
             ]
           }
         }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'vm', '/Install')]",
+        "apiVersion": "2020-12-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines/', concat(parameters('namespace'), parameters('vmbasename'), 'vm'))]",
+          "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+          },
+          "protectedSettings": {
+              "fileUris": [
+                  "[concat(parameters('_artifactsLocation'), 'provisioner.sh', parameters('_artifactsLocationSasToken'))]"
+                ],
+            "commandToExecute": "[concat('sudo bash ./provisioner.sh --role ', parameters('MySQLRole'), ' -i ', parameters('UniqueInstanceId'),' --orch-ipaddress ',  parameters('OpenArkPrivateIp'), ' --repl-password ', parameters('replication-password') ,' --orch-password ', parameters('orch-password'))]"
+          }
+        }
       }
-      // {
-      //   "type": "Microsoft.Compute/virtualMachines/extensions",
-      //   "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'vm', '/Install')]",
-      //   "apiVersion": "2020-12-01",
-      //   "location": "[parameters('location')]",
-      //   "dependsOn": [
-      //     "[resourceId('Microsoft.Compute/virtualMachines/', concat(parameters('namespace'), parameters('vmbasename'), 'vm'))]",
-      //     "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
-      //   ],
-      //   "properties": {
-      //     "publisher": "Microsoft.Azure.Extensions",
-      //     "type": "CustomScript",
-      //     "typeHandlerVersion": "2.0",
-      //     "autoUpgradeMinorVersion": true,
-      //     "settings": {
-      //     },
-      //     "protectedSettings": {
-      //         "fileUris": [
-      //             "[concat(parameters('_artifactsLocation'), 'provisioner.sh', parameters('_artifactsLocationSasToken'))]"
-      //           ],
-      //       "commandToExecute": "[concat('sudo bash ./provisioner.sh --role ', parameters('MySQLRole'), ' -i ', parameters('UniqueInstanceId'),' --orch-ipaddress ',  parameters('OpenArkPrivateIp'), ' --repl-password ', parameters('replication-password') ,' --orch-password ', parameters('orch-password'))]"
-      //     }
-      //   }
-      // }
     ],
     "outputs":{
         "sourceNic":{

@@ -169,31 +169,31 @@
             ]
           }
         }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'vm', '/Install')]",
+        "apiVersion": "2020-12-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines/', concat(parameters('namespace'), parameters('vmbasename'), 'vm'))]",
+          "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+          },
+          "protectedSettings": {
+              "fileUris": [
+                  "[concat(parameters('_artifactsLocation'), 'openark-provisioner.sh', parameters('_artifactsLocationSasToken'))]"
+                ],
+            "commandToExecute": "[concat('sudo bash ./openark-provisioner.sh --discover-username ', parameters('discover-username'), ' --discover-password ',  parameters('discover-password'), ' --orch-password ', parameters('orch-password'))]"
+          }
+        }
       }
-    //   {
-    //     "type": "Microsoft.Compute/virtualMachines/extensions",
-    //     "name": "[concat(parameters('namespace'), parameters('vmbasename'), 'vm', '/Install')]",
-    //     "apiVersion": "2020-12-01",
-    //     "location": "[parameters('location')]",
-    //     "dependsOn": [
-    //       "[resourceId('Microsoft.Compute/virtualMachines/', concat(parameters('namespace'), parameters('vmbasename'), 'vm'))]",
-    //       "[resourceId('Microsoft.Network/networkInterfaces/', concat(parameters('namespace'), parameters('vmbasename'), 'nic'))]"
-    //     ],
-    //     "properties": {
-    //       "publisher": "Microsoft.Azure.Extensions",
-    //       "type": "CustomScript",
-    //       "typeHandlerVersion": "2.0",
-    //       "autoUpgradeMinorVersion": true,
-    //       "settings": {
-    //       },
-    //       "protectedSettings": {
-    //           "fileUris": [
-    //               "[concat(parameters('_artifactsLocation'), 'openark-provisioner.sh', parameters('_artifactsLocationSasToken'))]"
-    //             ],
-    //         "commandToExecute": "[concat('sudo bash ./openark-provisioner.sh --discover-username ', parameters('discover-username'), ' --discover-password ',  parameters('discover-password'), ' --orch-password ', parameters('orch-password'))]"
-    //       }
-    //     }
-    //   }
     ],
     "outputs":{
         "openarkNic":{

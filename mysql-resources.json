@@ -8,7 +8,7 @@
       "authenticationType": {
         "type": "string"
       },
-      "adminPasswordOrKey": {
+     "adminPasswordOrKey": {
         "type": "string"
       },
       "discover-username" :{
@@ -26,9 +26,6 @@
       "namespace": {
         "type": "string"
       },
-      "vmbasename": {
-        "type": "string"
-      },
       "vmSize": {
         "type": "string"
       },
@@ -37,18 +34,6 @@
       },
       "subnetName": {
         "type": "string"
-      },
-      "zone": {
-        "type": "string",
-        "defaultValue": "1",
-        "allowedValues": [
-            "1",
-            "2",
-            "3"
-        ],
-        "metadata": {
-            "description": "Zone number for the virtual machine"
-        }
       },
       "location": {
         "type": "string",
@@ -69,45 +54,13 @@
       "metadata": {
         "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
-    },
-    "MySQLRole": {
-        "type": "string",
-        "defaultValue": "source",
-        "allowedValues": [
-            "source",
-            "replica"
-        ],
-        "metadata": {
-          "description": "Role of the MySQL Instance"
-        }
-      },
-    "UniqueInstanceId": {
-        "type": "string",
-        "metadata": {
-          "description": "ID of the MySQL instance"
-        }
-      },
-    "OpenArkPrivateIp": {
-        "type": "string",
-        "metadata": {
-          "description": "Private IP of the OpenArk VM"
-        }
-      },
-      "SourcePrivateIp": {
-        "type": "string",
-        "metadata": {
-          "description": "Private IP of the Primary/Source VM"
-        }
-      }
+    }
     },
     "variables": {
         //"sharedTemplateUrl": "[uri(parameters('_artifactsLocation'), concat('nested/shared-resources.json', parameters('_artifactsLocationSasToken')))]",
-        "OpenArkTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'openark-resources.json')]",
-        "OpenArkParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'open-ark-resources.paramters.json')]",
-        "SourceTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'primary-resources.json')]",
-        "SourceParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'primary-resources.paramters.json')]",
-        "ReplicaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'replica-resources.json')]",
-        "ReplicaParaTemplateUrl": "[uri('https://raw.githubusercontent.com/shashwatchandra/mysql/main/', 'replica01-resources.paramters.json')]"
+        "OpenArkTemplateUrl": "[uri(parameters('_artifactsLocation'), 'openark-resources.json')]",
+        "SourceTemplateUrl": "[uri(parameters('_artifactsLocation'), 'primary-resources.json')]",
+        "ReplicaTemplateUrl": "[uri(parameters('_artifactsLocation'), 'replica-resources.json')]"
     },
     "resources": [
         // {
@@ -176,7 +129,7 @@
                             "value": "[parameters('namespace')]"
                         },
                         "vmbasename": {
-                            "value": "[parameters('vmbasename')]"
+                            "value": "openark"
                         },
                         "vmSize": {
                             "value": "[parameters('vmSize')]"
@@ -188,7 +141,7 @@
                             "value": "[parameters('subnetName')]"
                         },
                         "zone": {
-                            "value": "[parameters('zone')]"
+                            "value": "1"
                         }
                 }
               
@@ -215,7 +168,7 @@
                             "value": "[parameters('authenticationType')]"
                         },
                          "adminPasswordOrKey": {
-                        "value": "[parameters('adminPasswordOrKey')]"
+                            "value": "[parameters('adminPasswordOrKey')]"
                         },
                          "replication-password": {
                             "value": "[parameters('replication-password')]"
@@ -236,7 +189,7 @@
                             "value": "[parameters('namespace')]"
                         },
                         "vmbasename": {
-                            "value": "[parameters('vmbasename')]"
+                            "value": "source"
                         },
                         "vmSize": {
                             "value": "[parameters('vmSize')]"
@@ -248,13 +201,13 @@
                             "value": "[parameters('subnetName')]"
                         },
                         "zone": {
-                            "value": "[parameters('zone')]"
+                            "value": "1"
                         },
                         "MySQLRole": {
-                            "value": "[parameters('MySQLRole')]"
+                            "value": "source"
                         },
                         "UniqueInstanceId": {
-                            "value": "[parameters('UniqueInstanceId')]"
+                            "value": "1"
                         },
                         "OpenArkPrivateIp": {
                            "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
@@ -281,7 +234,7 @@
                             "value": "[reference('OpenArkNode').outputs.openarkNic.value]"
                         },
                         "SourcePrivateIp": {
-                            "value": "[reference('SourceNode').outputs.replicaPublicIP.value]"
+                            "value": "[reference('SourceNode').outputs.sourcePublicIP.value]"
                         },
                         "zone": {
                             "value": "2"
@@ -320,7 +273,7 @@
                             "value": "[parameters('namespace')]"
                         },
                         "vmbasename": {
-                            "value": "[parameters('vmbasename')]"
+                            "value": "replica01"
                         },
                         "vmSize": {
                             "value": "[parameters('vmSize')]"
