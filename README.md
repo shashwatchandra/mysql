@@ -9,22 +9,3 @@ The script can be modify to launch more than one read-only replica is needed.
 The solution comes bundle with an OpenArk/Orchestrator to allow the operatator to modify the role of the mysql servers (Source, Replica) to aid in a manual failover.
 
 The scripts lack the use of a front side load balancer to allow a unique entry point to the overall service.
-
-
-
-+---------------+       +---------------+                 +--------------+
-|               |       |               |                 |              |
-|               |       |    MySQL      |                 |     MySQL    |
-|   OpenARK     |       |   Source      | <---------------+    Replica   |
-|  Orchestrator |       |  (Primary)    |                 |   (Backup)   |
-|               |       |               |                 |              |
-+---------------+       +---------------+                 +--------------+
-                               ^
-                               |
-                               |          +---------------+
-                               |          |               |
-                               |          |    MySQL      |
-                               |          |   Replica     |
-                               +--------- | (read-only)   |
-                                          |               |
-                                          +---------------+
