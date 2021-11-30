@@ -15,8 +15,8 @@ Available options:
 
 -h, --help                 Print this help and exit
 -v, --verbose              Print script debug info
-    --discover-username    Username for OpenArk orchestrator autodiscover. Default: orchpass
-    --discover-password    Password for OpenArk orchestrator autodiscover. Default: orchpass
+    --discover-username    Username for OpenArk orchestrator autodiscover. Default: 
+    --discover-password    Password for OpenArk orchestrator autodiscover. Default: 
     --orch-password	   UI Password for admin user
 EOF
   exit
@@ -49,8 +49,8 @@ die() {
 parse_params() {
   # default values of variables set from params
   orch_password=orchpass
-  discover_username="orchestrator"
-  discover_password="fifa2022"
+  discover_username=""
+  discover_password=""
 
   while :; do
     case "${1-}" in
