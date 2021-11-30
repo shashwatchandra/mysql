@@ -250,7 +250,8 @@ deploy_orchestrator_config() {
   "GraphiteConvertHostnameDotsToUnderscores": true,
   "ConsulAddress": "",
   "ConsulAclToken": "",
-  "ConsulKVStoreProvider": "consul"
+  "ConsulKVStoreProvider": "consul",
+  "MySQLTopologySSLSkipVerify": true
 }
 END_HEREDOC
 
