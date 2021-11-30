@@ -208,9 +208,9 @@ mysql_provision_users() {
     msg "Creating repl and orch users"
     mysql -uroot -e "create user 'repluser'@'%' identified by '$repl_password';"
     mysql -uroot -e "grant replication slave,replication client on *.* to 'repluser'@'%';"
-    mysql -uroot -e "create user 'orchestrator'@'openark' identified by '$orch_password';"
-    mysql -uroot -e "grant super,process,replication slave,replication client,reload on *.* to 'orchestrator'@'openark';"
-    mysql -uroot -e "grant select on meta.* to 'orchestrator'@'openark'";
+    mysql -uroot -e "create user 'orchestrator'@'%' identified by '$orch_password';"
+    mysql -uroot -e "grant super,process,replication slave,replication client,reload on *.* to 'orchestrator'@'%';"
+    mysql -uroot -e "grant select on meta.* to 'orchestrator'@'%'";
     mysql -uroot -e "flush privileges;"
 }
 
