@@ -12,19 +12,19 @@ The scripts lack the use of a front side load balancer to allow a unique entry p
 
 
 
-┌───────────────┐       ┌───────────────┐                 ┌──────────────┐
-│               │       │               │                 │              │
-│               │       │    MySQL      │                 │     MySQL    │
-│   OpenARK     │       │   Source      │◄───────────────┤    Replica   │
-│  Orchestrator │       │  (Primary)    │                 │   (Backup)   │
-│               │       │               │                 │              │
-└───────────────┘       └───────────────┘                 └──────────────┘
-                               ▲
-                               │
-                               │          ┌───────────────┐
-                               │          │               │
-                               │          │    MySQL      │
-                               │          │   Replica     │
-                               └───────── │ (read-only)   │
-                                          │               │
-                                          └───────────────┘
++---------------+       +---------------+                 +--------------+
+|               |       |               |                 |              |
+|               |       |    MySQL      |                 |     MySQL    |
+|   OpenARK     |       |   Source      | <---------------+    Replica   |
+|  Orchestrator |       |  (Primary)    |                 |   (Backup)   |
+|               |       |               |                 |              |
++---------------+       +---------------+                 +--------------+
+                               ^
+                               |
+                               |          +---------------+
+                               |          |               |
+                               |          |    MySQL      |
+                               |          |   Replica     |
+                               +--------- | (read-only)   |
+                                          |               |
+                                          +---------------+
