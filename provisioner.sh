@@ -28,8 +28,8 @@ Available options:
 -h, --help              Print this help and exit
 -v, --verbose           Print script debug info
 -r, --role              Role of the MySQL instance to be provisioned [source|replica|relay]. Default: source
-    --repl-password     Password for replication. Required if role is replica or relay. Default: replpass 
-    --orch-password     Password for OpenArk orchestrator autodiscover. Default: orchpass
+    --repl-password     Password for replication. Required if role is replica or relay. Default:  
+    --orch-password     Password for OpenArk orchestrator autodiscover. Default: 
 -o, --orch-ipaddress    Orchestrator IP address. Required for orchestrator discover
 -s, --source-ipaddress  IP address of the source. Required for replica and relay roles.
 -i, --id                Server-Id for MySQL replication. 
@@ -64,8 +64,8 @@ die() {
 parse_params() {
   # default values of variables set from params
   role=source
-  repl_password=replpass 
-  orch_password=orchpass
+  repl_password= 
+  orch_password=
   orch_ipaddress=""
   source_ipaddress=""
 
