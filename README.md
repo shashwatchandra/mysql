@@ -8,4 +8,6 @@ These set of ARM template deploy a cluster of Mysql Servers, including a source 
 The script can be modify to launch more than one read-only replica is needed.
 The solution comes bundle with an OpenArk/Orchestrator to allow the operatator to modify the role of the mysql servers (Source, Replica) to aid in a manual failover.
 
-The scripts lack the use of a front side load balancer to allow a unique entry point to the overall service.
+The ARM template lack the use of a front side load balancer to allow a unique entry point to the overall service.
+
+The ARM template requires an existing resource group and vnet to deploy the MySQL Servers
